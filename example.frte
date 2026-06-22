@@ -1,0 +1,13 @@
+import std.frte
+
+def inc
+    ++
+    var i <-
+    i ->
+done
+
+1
+
+5 loop
+    inc
+done
