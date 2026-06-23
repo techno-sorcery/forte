@@ -1,9 +1,8 @@
 #include "state.hpp"
-#include "helpers.hpp"
-#include "primitives.hpp"
+#include "loader.hpp"
 #include "prefix.hpp"
 #include "types.hpp"
-#include <iostream>
+#include <dlfcn.h>
 #include <string>
 
 // Global
@@ -14,9 +13,11 @@ State::State() {
     passedSym = false;
     dataBase = 0;
     parent = NULL;
+    handles = {};
 
     // Fill symtable with built-in functions
     symtable = new symtable_t {
+
         // Prefix
         {"for", prefix::forLoop},
         {"while", prefix::whileLoop},
@@ -26,46 +27,11 @@ State::State() {
         {"var", prefix::var},
         {"def", prefix::def},
         {"import", prefix::import},
-
-        // Arithmetic
-        {"+", primitives::add},
-        {"-", primitives::sub},
-        {"*", primitives::mult},
-        {"/", primitives::div},
-
-        // Bitwise
-        {"&", primitives::band},
-        {"|", primitives::bor},
-        {"^", primitives::bxor},
-        {"~", primitives::bnot},
-
-        // Comparison
-        {"&&", primitives::land},
-        {"||", primitives::lor},
-        {">", primitives::gt},
-        {"<", primitives::lt},
-        {"=", primitives::eq},
-        {"!", primitives::lnot},
-
-        // Control flow
-        {"exit", primitives::exit},
-
-        // Stack manipulation
-        {"drop", primitives::drop},
-        {"dup", primitives::dup},
-        {"<>", primitives::swap},
-
-        // IO
-        {"in", primitives::in},
-        {".#", primitives::outNum},
-        {".@", primitives::outChar},
-        {".$", primitives::outPtr},
-        {".%", primitives::outWord},
-
-        // Data
-        {"<-", primitives::set},
-        {"->", primitives::get},
     };
+
+    // Fill symtable with built-in functions
+    loader::loadModule(this, "modules/core.so");
+    loader::loadModule(this, "modules/io.so");
 }
 
 
@@ -76,6 +42,7 @@ State::State(StateContext context) {
     passedSym = false;
     dataBase = stateContext.data->size();
     parent = NULL;
+    handles = {};
 }
 
 
@@ -86,6 +53,7 @@ State::State(StateContext context, symtable_t* globalTable) {
     passedSym = true;
     dataBase = stateContext.data->size();
     parent = NULL;
+    handles = {};
 }
 
 // Loop/if statement
@@ -108,14 +76,21 @@ State::~State() {
         delete stateContext.data;
     }
 
+    // Handles
+    for (void* handle : handles) {
+        dlclose(handle);
+    }
+
+    // Symtable
     if (!passedSym) {
         delete symtable;
     }
 }
 
+void State::addFunct(std::string label, funct_t funct) {
+    validateSym(label, 1);
 
-void State::push(val_t val) {
-    stateContext.stack->push(val);
+    (*symtable)[label] = funct;
 }
 
 void State::validateSym(std::string label, bool checkExists) {
@@ -253,7 +228,7 @@ ptr_t State::alloc(int entries) {
 // Interpret a line of code
 void State::eval(tokens_t* tokens) {
     State* global = stateContext.global;
-    
+
     // Evaluate all tokens
     for (std::string token : *tokens) {
         std::string lower = token;

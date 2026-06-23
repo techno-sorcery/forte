@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdexcept>
+#include <string>
 
 #include "prefix.hpp"
 #include "types.hpp"
@@ -42,7 +43,6 @@ class State {
                 }
             }
 
-        void push(val_t val); // Push value to stack
 
         ptr_t alloc(int entries); // Allocate blank entries
 
@@ -57,6 +57,15 @@ class State {
         void setData(ptr_t ptr, val_t val); // Set data at pointer location
 
         void eval(tokens_t* tokens); // Evaluate expression
+        void addFunct(std::string label, funct_t funct); // Add module funct
+
+        void push(val_t val) { // Push value to stack
+            stateContext.stack->push(val);
+        }
+
+        void addHandle(void* handle) {
+            handles.push_back(handle);
+        }
 
         StateContext getStateContext() {
             return stateContext;
@@ -79,6 +88,7 @@ class State {
         ptr_t dataBase;
         bool passedSym = false;
         State* parent = NULL;
+        std::vector<void*> handles;
 
         // Validate label
         void validateSym(std::string label, bool checkExists); 

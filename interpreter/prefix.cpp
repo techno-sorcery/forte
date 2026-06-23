@@ -4,6 +4,7 @@
 #include "prefix.hpp"
 #include "helpers.hpp"
 #include "types.hpp"
+#include "loader.hpp"
 
 const std::unordered_set<std::string_view> prefixTokens = {
     "for", "def", "while", "if", "rep"
@@ -287,6 +288,11 @@ namespace prefix {
         return false;
     }
 
+    bool endsWith(const std::string& str, const std::string& suffix) {
+        return str.size() >= suffix.size()
+            && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+    }
+
     bool import(State* state, std::string token) {
         if (token == "") { // First iteration
             return false;
@@ -294,8 +300,13 @@ namespace prefix {
         }  
 
         // Second iteration
-        State importState(state->getStateContext(), state->getSymtable());
+        if (endsWith(token, ".so")) {
+            loader::loadModule(state, token);
+            printf("Loaded\n");
+            return true;
+        }
 
+        State importState(state->getStateContext(), state->getSymtable());
         helpers::file(&importState, token);
         return true;
     }
