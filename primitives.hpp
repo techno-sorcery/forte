@@ -14,6 +14,7 @@ namespace primitives {
     void band(State* state);
     void bor(State* state);
     void bxor(State* state);
+    void bnot(State* state);
 
     // Comparison
     void land(State* state);
@@ -21,6 +22,7 @@ namespace primitives {
     void gt(State* state);
     void lt(State* state);
     void eq(State* state);
+    void lnot(State* state);
 
     // Control Flow
     void exit(State* state);

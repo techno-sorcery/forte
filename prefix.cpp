@@ -1,6 +1,13 @@
+#include <iostream>
+#include <string_view>
+#include <unordered_set>
 #include "prefix.hpp"
 #include "helpers.hpp"
 #include "types.hpp"
+
+const std::unordered_set<std::string_view> prefixTokens = {
+    "for", "def", "while", "if", "rep"
+};
 
 typedef struct TokenWrapper {
     tokens_t* tokens;
@@ -9,12 +16,12 @@ typedef struct TokenWrapper {
 
 namespace {
     void addToken(TokenWrapper wrapper, std::string token) {
-        wrapper.tokens->push_back(token);
+        if (wrapper.tokens != NULL) {
+            wrapper.tokens->push_back(token);
+        }
 
         // Increase depth
-        if (token == "for" ||
-                token == "def" ||
-                token == "while") {
+        if (prefixTokens.count(token)) {
 
             (*wrapper.depth)++;
 
@@ -57,6 +64,59 @@ namespace prefix {
         }
 
         return true;
+    }
+
+    bool ifElse(State* state, std::string token) {
+        PrefixContext* prefixContext = state->getPrefixContext();
+
+        if (token == "") { // First iteration
+            IfContext context;
+
+            context.condition = helpers::cast<word_t>(state->pop<val_t>());
+            prefixContext->data = context;
+
+            return false;
+        } 
+
+        IfContext* context = &std::get<IfContext>(prefixContext->data);
+
+        if (token == "done" && context->depth == 0) { // Last iteratiion
+
+            // Only bother to eval if size > 0 
+            if (context->body.size() > 0) {
+
+                // Create child state
+                State child(state->getStateContext(), state);
+
+                // Evaluate body
+                child.eval(&context->body);
+            }
+
+            return true;
+
+        } else if (token == "else" && context->depth == 0) { // Else
+            context->readElse = true;
+
+        } else if  (context->condition) { // True
+
+            if (!context->readElse) { // Read section before else
+                addToken({&context->body, &context->depth}, token);
+
+            } else { // Don't store, but keep track of depth
+                addToken({NULL, &context->depth}, token);
+            }
+
+        } else if (!context->condition) { // False
+
+            if (context->readElse) { // Read section after else
+                addToken({&context->body, &context->depth}, token);
+
+            } else { // Don't store, but keep track of depth
+                addToken({NULL, &context->depth}, token); 
+            }
+        }
+
+        return false;
     }
 
     bool rep(State* state, std::string token) {
@@ -134,9 +194,9 @@ namespace prefix {
 
                     // Evaluate condition
                     child.eval(&context->cond);
-                    num_t result = child.pop<num_t>();
+                    val_t val = child.pop<val_t>();
 
-                    if (!result) {
+                    if (!helpers::cast<word_t>(val)) {
                         break;
                     }
 
@@ -203,9 +263,9 @@ namespace prefix {
 
                     // Evaluate condition
                     child.eval(&context->cond);
-                    num_t result = child.pop<num_t>();
+                    val_t val = child.pop<val_t>();
 
-                    if (!result) {
+                    if (!helpers::cast<word_t>(val)) {
                         break;
                     }
 

@@ -21,6 +21,7 @@ State::State() {
         {"for", prefix::forLoop},
         {"while", prefix::whileLoop},
         {"rep", prefix::rep},
+        {"if", prefix::ifElse},
         {"cast", prefix::cast},
         {"var", prefix::var},
         {"def", prefix::def},
@@ -36,6 +37,7 @@ State::State() {
         {"&", primitives::band},
         {"|", primitives::bor},
         {"^", primitives::bxor},
+        {"~", primitives::bnot},
 
         // Comparison
         {"&&", primitives::land},
@@ -43,6 +45,7 @@ State::State() {
         {">", primitives::gt},
         {"<", primitives::lt},
         {"=", primitives::eq},
+        {"!", primitives::lnot},
 
         // Control flow
         {"exit", primitives::exit},

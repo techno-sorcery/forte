@@ -1,11 +1,29 @@
 import std.frte
 
+"balls\n" print
+
+var test 1 <<-
+
+test -> 0 = if
+    'a' .@
+else 
+    test -> 1 = if 
+        'b' .@
+    done
+done 
+
+
 for var a 0 <<-
     cond a -> 5  <
     step a ++
     do
-        'c' .@ \n
-        a ->
+        a -> 0 = if
+            'a' .@
+        else 
+            a -> 2 = if 
+                'b' .@
+            done
+        done 
 done
 
 var b 10 <<-
@@ -17,3 +35,11 @@ done
 
 "Hello"
 5 rep .@ done \n
+
+5 1 > if
+   'a' .@ \n
+else
+    'b' .@ \n
+done
+
+

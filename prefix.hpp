@@ -38,6 +38,13 @@ typedef struct WhileContext {
     int depth = 0;
 } WhileContext;
 
+typedef struct IfContext {
+    tokens_t body;
+    bool condition = false;
+    bool readElse = false;
+    int depth = 0;
+} IfContext;
+
 typedef struct DefContext {
     tokens_t* tokens = NULL;
     int depth = 0;
@@ -46,7 +53,9 @@ typedef struct DefContext {
 using PrefixData = std::variant<DefContext, 
       ForContext, 
       WhileContext, 
-      RepContext>;
+      RepContext,
+      IfContext
+      >;
 
 typedef struct PrefixContext {
     prefix_t prefix = NULL;
@@ -60,7 +69,8 @@ namespace prefix {
     // Data
     bool cast(State* state, std::string token); // Typecasting 
 
-    // Conditions
+    // Conditionals
+    bool ifElse(State* state, std::string token); // If-Else
 
     // Loops
     bool forLoop(State* state, std::string token); // For 

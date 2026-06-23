@@ -147,3 +147,10 @@ done
 def \t ( - )
     '\t' .@
 done
+
+; Print string
+def print ( ... @ -)
+    while dup '\0' = ! do
+        .@
+    done
+done

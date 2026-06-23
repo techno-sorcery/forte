@@ -5,6 +5,7 @@
 
 #include "primitives.hpp"
 #include "helpers.hpp"
+#include "types.hpp"
 
 namespace {
     template <typename T>
@@ -32,13 +33,11 @@ namespace {
 
         std::cout << helpers::cast<T>(a);
     }
-
 }
 
 namespace primitives {
 
     // Arithmetic
-
     void add(State* state) {
         arithmetic<num_t>(state, [](num_t a, num_t b) {
                 return a + b;
@@ -86,39 +85,51 @@ namespace primitives {
                 });
     }
 
+    void bnot(State* state) {
+        word_t word = helpers::cast<word_t>(state->pop<val_t>());
+
+        state->push(~word);
+    }
+
 
 
     // Comparison
-
     void land(State* state) {
         arithmetic<num_t>(state, [](num_t a, num_t b) {
-                return static_cast<num_t>(a && b);
+                return static_cast<word_t>(a && b);
                 });
     }
 
     void lor(State* state) {
         arithmetic<num_t>(state, [](num_t a, num_t b) {
-                return static_cast<num_t>(a || b);
+                return static_cast<word_t>(a || b);
                 });
     }
 
     void gt(State* state) {
         arithmetic<num_t>(state, [](num_t a, num_t b) {
-                return static_cast<num_t>(a > b);
+                return static_cast<word_t>(a > b);
                 });
     }
 
     void lt(State* state) {
         arithmetic<num_t>(state, [](num_t a, num_t b) {
-                return static_cast<num_t>(a < b);
+                return static_cast<word_t>(a < b);
                 });
     }
 
     void eq(State* state) {
         arithmetic<num_t>(state, [](num_t a, num_t b) {
-                return static_cast<num_t>(a == b);
+                return static_cast<word_t>(a == b);
                 });
     }
+
+    void lnot(State* state) {
+        word_t word = helpers::cast<word_t>(state->pop<val_t>());
+
+        state->push(static_cast<word_t>(word == 0));
+    }
+
 
     // Control Flow
 

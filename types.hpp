@@ -15,7 +15,7 @@ using num_t = double; // Numeric type
 using ptr_t = std::size_t; // Pointer type
 using char_t = char; // Character type
 using word_t = unsigned long long; // Raw (untyped) type
-using val_t = std::variant<std::monostate, ptr_t, num_t, word_t, char_t>; // Generic value type
+using val_t = std::variant<num_t, ptr_t, word_t, char_t>; // Generic value type
 
 using tokens_t = std::vector<std::string>; // Token vector (defined functions)
 using stack_t = std::stack<val_t>; // Return stack
