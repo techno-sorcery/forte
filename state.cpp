@@ -18,6 +18,10 @@ State::State() {
     // Fill symtable with built-in functions
     symtable = new symtable_t {
         // Prefix
+        {"for", prefix::forLoop},
+        {"while", prefix::whileLoop},
+        {"rep", prefix::rep},
+        {"cast", prefix::cast},
         {"var", prefix::var},
         {"def", prefix::def},
         {"import", prefix::import},
@@ -50,7 +54,10 @@ State::State() {
 
         // IO
         {"in", primitives::in},
-        {"out", primitives::out},
+        {".#", primitives::outNum},
+        {".@", primitives::outChar},
+        {".$", primitives::outPtr},
+        {".%", primitives::outWord},
 
         // Data
         {"<-", primitives::set},
@@ -186,10 +193,10 @@ tokens_t* State::newFunction(std::string label) {
     // Check validity of label
     validateSym(label, 1);
 
-    tokens_t* tokens = new std::vector<std::string>;
+    tokens_t tokens;
     (*symtable)[label] = tokens;
 
-    return tokens;
+    return &std::get<tokens_t>((*symtable)[label]);
 }
 
 val_t State::getData(ptr_t ptr) {
@@ -197,13 +204,6 @@ val_t State::getData(ptr_t ptr) {
 
     validatePtr(ptr);
     val_t val = (*data)[ptr];
-
-    if (std::holds_alternative<std::monostate>(val)) std::cout << "monostate\n";
-    if (std::holds_alternative<ptr_t>(val)) std::cout << "ptr_t\n";
-    if (std::holds_alternative<num_t>(val)) std::cout << "num_t\n";
-    if (std::holds_alternative<char_t>(val)) std::cout << "char_t\n";
-    if (std::holds_alternative<word_t>(val)) std::cout << "word_t\n";
-    std::cout << "Pointer: " << ptr << " Val" << helpers::cast<double>(val) << "\n";
 
     return (*data)[ptr];
 }
@@ -308,8 +308,8 @@ void State::eval(tokens_t* tokens) {
                 // Push pointer to stack
                 push(ptr);
 
-            } else if (std::holds_alternative<tokens_t*>(entry)) { // User funct
-                tokens_t* tokens = std::get<tokens_t*>(entry);
+            } else if (std::holds_alternative<tokens_t>(entry)) { // User funct
+                tokens_t* tokens = &std::get<tokens_t>(entry);
 
                 // Create new scope
                 State state(stateContext);

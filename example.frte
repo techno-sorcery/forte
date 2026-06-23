@@ -1,13 +1,19 @@
 import std.frte
 
-def inc
-    ++
-    var i <-
-    i ->
+for var a 0 <<-
+    cond a -> 5  <
+    step a ++
+    do
+        'c' .@ \n
+        a ->
 done
 
-1
+var b 10 <<-
 
-5 loop
-    inc
+while b -> 0 > do
+    b -> .# \n
+    b --
 done
+
+"Hello"
+5 rep .@ done \n

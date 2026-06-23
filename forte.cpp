@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include <vector>
 
 #include "helpers.hpp"
 #include "types.hpp"

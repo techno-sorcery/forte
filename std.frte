@@ -1,5 +1,149 @@
-def ++ 1 + done
+; -------------------------
+; Stack helpers
+; -------------------------
 
-def -- 1 - done
+; Duplicate second item
+def over ( a b - a b a )
+    <> dup <>
+done
 
-def <<- <> <- done
+; Drop second item
+def nip ( a b - b )
+    <> drop
+done
+
+; Duplicate two items
+def dup2 ( a b - a b a b )
+    over over
+done
+
+; Drop two items
+def drop2 ( a b - )
+    drop drop
+done
+
+; Swap-set var
+def <<- ( - $ )
+    <> <-
+done
+
+
+; -------------------------
+; Cast sets
+; -------------------------
+
+; Set ptr
+def <$ ( ? $ - )
+    <>
+    cast $
+    <> <-
+done
+
+; Set num
+def <# ( ? $ - )
+    <>
+    cast #
+    <> <-
+done
+
+; Set word
+def <% ( ? $ - )
+    <>
+    cast %
+    <> <-
+done
+
+; Set char
+def <@ ( ? $ - )
+    <>
+    cast @
+    <> <-
+done
+
+
+; -------------------------
+; Cast swap-sets
+; -------------------------
+
+; Swap-set ptr
+def <<$ ( $ ? - )
+    cast $
+    <> <-
+done
+
+; Swap-set num
+def <<# ( $ ? - )
+    cast #
+    <> <-
+done
+
+; Swap-set word
+def <<% ( $ ? - )
+    cast %
+    <> <-
+done
+
+; Swap-set char
+def <<@ ( $ ? - )
+    cast @
+    <> <-
+done
+
+
+; -------------------------
+; Cast gets
+; -------------------------
+
+; Get ptr
+def $> ( $ - $ )
+    ->
+    cast $
+done
+
+; Get num
+def #> ( $ - # )
+    ->
+    cast #
+done
+
+; Get word
+def %> ( $ - % )
+    ->
+    cast %
+done
+
+; Get char
+def @> ( $ - @ )
+    ->
+    cast @
+done
+
+
+; -------------------------
+; Variable arithmetic
+; -------------------------
+
+; Increment num in var
+def ++ ( $ - )
+    dup -> 1 + <<- 
+done
+
+; Decrement num in var
+def -- ( $ - )
+    dup -> 1 - <<- 
+done
+
+
+; -------------------------
+; IO
+; -------------------------
+
+; Print blank line
+def \n ( - )
+    '\n' .@
+done
+
+; Print tab 
+def \t ( - )
+    '\t' .@
+done

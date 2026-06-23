@@ -25,6 +25,14 @@ namespace {
 
         state->push(op(av, bv));
     }
+
+    template <typename T>
+    void out(State* state) {
+        val_t a = state->pop<val_t>();
+
+        std::cout << helpers::cast<T>(a);
+    }
+
 }
 
 namespace primitives {
@@ -149,12 +157,6 @@ namespace primitives {
 
 
     // IO
-    void out(State* state) {
-        val_t a = state->pop<val_t>();
-
-        std::cout << helpers::cast<char_t>(a);
-    }
-
     void in(State* state) {
         char_t c;
 
@@ -165,6 +167,21 @@ namespace primitives {
         state->push(c);
     }
 
+    void outChar(State* state) {
+        out<char_t>(state);
+    }
+
+    void outNum(State* state) {
+        out<num_t>(state);
+    }
+
+    void outPtr(State* state) {
+        out<ptr_t>(state);
+    }
+
+    void outWord(State* state) {
+        out<word_t>(state);
+    }
 
     // Data
     void set(State* state) {

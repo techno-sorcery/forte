@@ -31,7 +31,7 @@ using prefix_t = bool(*)(State*, std::string); // Primitive prefix functions
    primitive value, array of primitive values, or array of tokens (user defined
    function)
 */
-using entry_t = std::variant<funct_t, prefix_t, ptr_t, tokens_t*>;
+using entry_t = std::variant<funct_t, prefix_t, ptr_t, tokens_t>;
 using symtable_t = std::map<std::string, entry_t>; // Symtable map
 
 // Struct for holding state class context

@@ -31,8 +31,11 @@ namespace primitives {
     void swap(State* state);
 
     // IO
-    void out(State* state); // Print char
     void in(State* state); // Get char from keyboard
+    void outChar(State* state); // Print char
+    void outNum(State* state); // Print num
+    void outPtr(State* state); // Print ptr
+    void outWord(State* state); // Print word
 
     // Data
     void toNum(State* state);
