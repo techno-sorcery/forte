@@ -4,7 +4,7 @@
 #include "types.hpp"
 
 // Generally useful helper functions
-namespace helpers {
+namespace forte::helpers {
     tokens_t tokenize(std::string input);
 
     // Cast value types

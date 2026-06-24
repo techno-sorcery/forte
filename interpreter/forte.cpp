@@ -16,14 +16,14 @@ void file();
 
 void interactive() {
     std::string line;
-    State state;
+    forte::State state;
 
     std::cout << INTERACTIVE_STRING << "\n" << INTERACTIVE_PROMPT;
 
     // Loop until ctrl+c
     while (std::getline(std::cin, line)) {
         try {
-            tokens_t tokens = helpers::tokenize(line);
+            forte::tokens_t tokens = forte::helpers::tokenize(line);
             state.eval(&tokens);
 
         } catch (const std::runtime_error& e) { // Handle error
@@ -42,8 +42,8 @@ int main(int argc, char *argv[]) {
             interactive();
 
         } else if (argc == 2) {
-            State state;
-            loader::loadFile(&state, argv[1]);
+            forte::State state;
+            forte::loader::loadFile(&state, argv[1]);
 
         } else {
             std::cerr << "Usage: " << argv[0] << " [file]" << std::endl;

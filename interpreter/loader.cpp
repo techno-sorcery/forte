@@ -3,7 +3,7 @@
 #include "loader.hpp"
 #include "helpers.hpp"
 
-namespace loader {
+namespace forte::loader {
     void loadFile(State* state, std::string filename) {
         std::string line;
         std::ifstream input(filename);

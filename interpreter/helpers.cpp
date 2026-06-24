@@ -1,7 +1,7 @@
 #include "helpers.hpp"
 
 // Helper function to tokenize a string
-namespace helpers {
+namespace forte::helpers {
 
     tokens_t tokenize(std::string input) {
         tokens_t tokens;

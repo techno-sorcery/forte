@@ -6,332 +6,336 @@
 #include "../interpreter/helpers.hpp"
 #include "../interpreter/types.hpp"
 
-template <typename A, typename B = A, typename Out = A, typename Op>
-void arithmetic(State* state, Op op) {
-    val_t b = state->pop<val_t>();
-    val_t a;
+namespace forte::modules::core {
+    template <typename A, typename B = A, typename Out = A, typename Op>
+        void arithmetic(State* state, Op op) {
+            val_t b = state->pop<val_t>();
+            val_t a;
 
-    try {
-        a = state->pop<val_t>();
-    } catch (const std::runtime_error&) {
-        state->push(b);
-        throw;
-    }
+            try {
+                a = state->pop<val_t>();
+            } catch (const std::runtime_error&) {
+                state->push(b);
+                throw;
+            }
 
-    A av = helpers::cast<A>(a);
-    B bv = helpers::cast<B>(b);
+            A av = helpers::cast<A>(a);
+            B bv = helpers::cast<B>(b);
 
-    state->push(static_cast<Out>(op(av, bv)));
-}
-
-// Arithmetic
-void add(State* state) {
-    arithmetic<num_t>(state, [](num_t a, num_t b) {
-        return a + b;
-    });
-}
-
-void sub(State* state) {
-    arithmetic<num_t>(state, [](num_t a, num_t b) {
-        return a - b;
-    });
-}
-
-void mult(State* state) {
-    arithmetic<num_t>(state, [](num_t a, num_t b) {
-        return a * b;
-    });
-}
-
-void divide(State* state) {
-    arithmetic<num_t>(state, [](num_t a, num_t b) {
-        if (b == 0) {
-            throw std::runtime_error("Divide-by-zero");
+            state->push(static_cast<Out>(op(av, bv)));
         }
 
-        return a / b;
-    });
-}
-
-// Bitwise
-
-void band(State* state) {
-    arithmetic<word_t>(state, [](word_t a, word_t b) {
-        return a & b;
-    });
-}
-
-void bor(State* state) {
-    arithmetic<word_t>(state, [](word_t a, word_t b) {
-        return a | b;
-    });
-}
-
-void bxor(State* state) {
-    arithmetic<word_t>(state, [](word_t a, word_t b) {
-        return a ^ b;
-    });
-}
-
-void bnot(State* state) {
-    word_t word = helpers::cast<word_t>(state->pop<val_t>());
-
-    state->push(static_cast<word_t>(~word));
-}
-
-void shl(State* state) {
-    arithmetic<word_t, num_t, word_t>(state, [](word_t a, num_t b) {
-        if (b < 0) {
-            throw std::runtime_error("Negative shift");
-        }
-
-        auto word = static_cast<std::uint64_t>(a);
-        auto shift = static_cast<unsigned int>(b);
-
-        if (shift >= 64) {
-            throw std::runtime_error("Shift too large");
-        }
-
-        return static_cast<word_t>(word << shift);
-    });
-}
-
-void shr(State* state) {
-    arithmetic<word_t, num_t, word_t>(state, [](word_t a, num_t b) {
-        if (b < 0) {
-            throw std::runtime_error("Negative shift");
-        }
-
-        auto word = static_cast<std::uint64_t>(a);
-        auto shift = static_cast<unsigned int>(b);
-
-        if (shift >= 64) {
-            throw std::runtime_error("Shift too large");
-        }
-
-        return static_cast<word_t>(word >> shift);
-    });
-}
-
-// Comparison / Logic
-
-void land(State* state) {
-    arithmetic<word_t, word_t, word_t>(state, [](word_t a, word_t b) {
-        return static_cast<word_t>(a && b);
-    });
-}
-
-void lor(State* state) {
-    arithmetic<word_t, word_t, word_t>(state, [](word_t a, word_t b) {
-        return static_cast<word_t>(a || b);
-    });
-}
-
-void gt(State* state) {
-    arithmetic<num_t, num_t, word_t>(state, [](num_t a, num_t b) {
-        return static_cast<word_t>(a > b);
-    });
-}
-
-void lt(State* state) {
-    arithmetic<num_t, num_t, word_t>(state, [](num_t a, num_t b) {
-        return static_cast<word_t>(a < b);
-    });
-}
-
-void eq(State* state) {
-    arithmetic<num_t, num_t, word_t>(state, [](num_t a, num_t b) {
-        return static_cast<word_t>(a == b);
-    });
-}
-
-void neq(State* state) {
-    arithmetic<num_t, num_t, word_t>(state, [](num_t a, num_t b) {
-        return static_cast<word_t>(a != b);
-    });
-}
-
-void lte(State* state) {
-    arithmetic<num_t, num_t, word_t>(state, [](num_t a, num_t b) {
-        return static_cast<word_t>(a <= b);
-    });
-}
-
-void gte(State* state) {
-    arithmetic<num_t, num_t, word_t>(state, [](num_t a, num_t b) {
-        return static_cast<word_t>(a >= b);
-    });
-}
-
-void lnot(State* state) {
-    word_t word = helpers::cast<word_t>(state->pop<val_t>());
-
-    state->push(static_cast<word_t>(word == 0));
-}
-
-// Control
-
-void exitProgram(State* state) {
-    (void)state;
-
-    std::exit(0);
-}
-
-// Stack manipulation
-
-void drop(State* state) {
-    state->pop<val_t>();
-}
-
-void dup(State* state) {
-    val_t a = state->pop<val_t>();
-
-    state->push(a);
-    state->push(a);
-}
-
-void swap(State* state) {
-    val_t b = state->pop<val_t>();
-    val_t a;
-
-    try {
-        a = state->pop<val_t>();
-    } catch (const std::runtime_error&) {
-        state->push(b);
-        throw;
+    // Arithmetic
+    void add(State* state) {
+        arithmetic<num_t>(state, [](num_t a, num_t b) {
+                return a + b;
+                });
     }
 
-    state->push(b);
-    state->push(a);
-}
-
-void over(State* state) {
-    val_t b = state->pop<val_t>();
-    val_t a;
-
-    try {
-        a = state->pop<val_t>();
-    } catch (const std::runtime_error&) {
-        state->push(b);
-        throw;
+    void sub(State* state) {
+        arithmetic<num_t>(state, [](num_t a, num_t b) {
+                return a - b;
+                });
     }
 
-    state->push(a);
-    state->push(b);
-    state->push(a);
-}
-
-void rot(State* state) {
-    val_t c = state->pop<val_t>();
-    val_t b;
-    val_t a;
-
-    try {
-        b = state->pop<val_t>();
-        a = state->pop<val_t>();
-    } catch (const std::runtime_error&) {
-        state->push(c);
-        throw;
+    void mult(State* state) {
+        arithmetic<num_t>(state, [](num_t a, num_t b) {
+                return a * b;
+                });
     }
 
-    state->push(b);
-    state->push(c);
-    state->push(a);
-}
+    void divide(State* state) {
+        arithmetic<num_t>(state, [](num_t a, num_t b) {
+                if (b == 0) {
+                throw std::runtime_error("Divide-by-zero");
+                }
 
-void nip(State* state) {
-    val_t b = state->pop<val_t>();
-    val_t a;
-
-    try {
-        a = state->pop<val_t>();
-    } catch (const std::runtime_error&) {
-        state->push(b);
-        throw;
+                return a / b;
+                });
     }
 
-    (void)a;
+    // Bitwise
 
-    state->push(b);
-}
-
-void tuck(State* state) {
-    val_t b = state->pop<val_t>();
-    val_t a;
-
-    try {
-        a = state->pop<val_t>();
-    } catch (const std::runtime_error&) {
-        state->push(b);
-        throw;
+    void band(State* state) {
+        arithmetic<word_t>(state, [](word_t a, word_t b) {
+                return a & b;
+                });
     }
 
-    state->push(b);
-    state->push(a);
-    state->push(b);
-}
+    void bor(State* state) {
+        arithmetic<word_t>(state, [](word_t a, word_t b) {
+                return a | b;
+                });
+    }
 
-void twoDrop(State* state) {
-    val_t b = state->pop<val_t>();
+    void bxor(State* state) {
+        arithmetic<word_t>(state, [](word_t a, word_t b) {
+                return a ^ b;
+                });
+    }
 
-    try {
+    void bnot(State* state) {
+        word_t word = helpers::cast<word_t>(state->pop<val_t>());
+
+        state->push(static_cast<word_t>(~word));
+    }
+
+    void shl(State* state) {
+        arithmetic<word_t, num_t, word_t>(state, [](word_t a, num_t b) {
+                if (b < 0) {
+                throw std::runtime_error("Negative shift");
+                }
+
+                auto word = static_cast<std::uint64_t>(a);
+                auto shift = static_cast<unsigned int>(b);
+
+                if (shift >= 64) {
+                throw std::runtime_error("Shift too large");
+                }
+
+                return static_cast<word_t>(word << shift);
+                });
+    }
+
+    void shr(State* state) {
+        arithmetic<word_t, num_t, word_t>(state, [](word_t a, num_t b) {
+                if (b < 0) {
+                throw std::runtime_error("Negative shift");
+                }
+
+                auto word = static_cast<std::uint64_t>(a);
+                auto shift = static_cast<unsigned int>(b);
+
+                if (shift >= 64) {
+                throw std::runtime_error("Shift too large");
+                }
+
+                return static_cast<word_t>(word >> shift);
+                });
+    }
+
+    // Comparison / Logic
+
+    void land(State* state) {
+        arithmetic<word_t, word_t, word_t>(state, [](word_t a, word_t b) {
+                return static_cast<word_t>(a && b);
+                });
+    }
+
+    void lor(State* state) {
+        arithmetic<word_t, word_t, word_t>(state, [](word_t a, word_t b) {
+                return static_cast<word_t>(a || b);
+                });
+    }
+
+    void gt(State* state) {
+        arithmetic<num_t, num_t, word_t>(state, [](num_t a, num_t b) {
+                return static_cast<word_t>(a > b);
+                });
+    }
+
+    void lt(State* state) {
+        arithmetic<num_t, num_t, word_t>(state, [](num_t a, num_t b) {
+                return static_cast<word_t>(a < b);
+                });
+    }
+
+    void eq(State* state) {
+        arithmetic<num_t, num_t, word_t>(state, [](num_t a, num_t b) {
+                return static_cast<word_t>(a == b);
+                });
+    }
+
+    void neq(State* state) {
+        arithmetic<num_t, num_t, word_t>(state, [](num_t a, num_t b) {
+                return static_cast<word_t>(a != b);
+                });
+    }
+
+    void lte(State* state) {
+        arithmetic<num_t, num_t, word_t>(state, [](num_t a, num_t b) {
+                return static_cast<word_t>(a <= b);
+                });
+    }
+
+    void gte(State* state) {
+        arithmetic<num_t, num_t, word_t>(state, [](num_t a, num_t b) {
+                return static_cast<word_t>(a >= b);
+                });
+    }
+
+    void lnot(State* state) {
+        word_t word = helpers::cast<word_t>(state->pop<val_t>());
+
+        state->push(static_cast<word_t>(word == 0));
+    }
+
+    // Control
+
+    void exitProgram(State* state) {
+        (void)state;
+
+        std::exit(0);
+    }
+
+    // Stack manipulation
+
+    void drop(State* state) {
         state->pop<val_t>();
-    } catch (const std::runtime_error&) {
+    }
+
+    void dup(State* state) {
+        val_t a = state->pop<val_t>();
+
+        state->push(a);
+        state->push(a);
+    }
+
+    void swap(State* state) {
+        val_t b = state->pop<val_t>();
+        val_t a;
+
+        try {
+            a = state->pop<val_t>();
+        } catch (const std::runtime_error&) {
+            state->push(b);
+            throw;
+        }
+
         state->push(b);
-        throw;
+        state->push(a);
     }
-}
 
-void twoDup(State* state) {
-    val_t b = state->pop<val_t>();
-    val_t a;
+    void over(State* state) {
+        val_t b = state->pop<val_t>();
+        val_t a;
 
-    try {
-        a = state->pop<val_t>();
-    } catch (const std::runtime_error&) {
+        try {
+            a = state->pop<val_t>();
+        } catch (const std::runtime_error&) {
+            state->push(b);
+            throw;
+        }
+
+        state->push(a);
         state->push(b);
-        throw;
+        state->push(a);
     }
 
-    state->push(a);
-    state->push(b);
-    state->push(a);
-    state->push(b);
-}
+    void rot(State* state) {
+        val_t c = state->pop<val_t>();
+        val_t b;
+        val_t a;
 
-// Data
+        try {
+            b = state->pop<val_t>();
+            a = state->pop<val_t>();
+        } catch (const std::runtime_error&) {
+            state->push(c);
+            throw;
+        }
 
-void set(State* state) {
-    ptr_t ptr = state->pop<ptr_t>();
-    val_t val;
-
-    try {
-        val = state->pop<val_t>();
-    } catch (const std::runtime_error&) {
-        state->push(ptr);
-        throw;
+        state->push(b);
+        state->push(c);
+        state->push(a);
     }
 
-    state->setData(ptr, val);
-}
+    void nip(State* state) {
+        val_t b = state->pop<val_t>();
+        val_t a;
 
-void get(State* state) {
-    ptr_t ptr = state->pop<ptr_t>();
-    val_t val;
+        try {
+            a = state->pop<val_t>();
+        } catch (const std::runtime_error&) {
+            state->push(b);
+            throw;
+        }
 
-    try {
-        val = state->getData(ptr);
-    } catch (const std::runtime_error&) {
-        state->push(ptr);
-        throw;
+        (void)a;
+
+        state->push(b);
     }
 
-    state->push(val);
+    void tuck(State* state) {
+        val_t b = state->pop<val_t>();
+        val_t a;
+
+        try {
+            a = state->pop<val_t>();
+        } catch (const std::runtime_error&) {
+            state->push(b);
+            throw;
+        }
+
+        state->push(b);
+        state->push(a);
+        state->push(b);
+    }
+
+    void twoDrop(State* state) {
+        val_t b = state->pop<val_t>();
+
+        try {
+            state->pop<val_t>();
+        } catch (const std::runtime_error&) {
+            state->push(b);
+            throw;
+        }
+    }
+
+    void twoDup(State* state) {
+        val_t b = state->pop<val_t>();
+        val_t a;
+
+        try {
+            a = state->pop<val_t>();
+        } catch (const std::runtime_error&) {
+            state->push(b);
+            throw;
+        }
+
+        state->push(a);
+        state->push(b);
+        state->push(a);
+        state->push(b);
+    }
+
+    // Data
+
+    void set(State* state) {
+        ptr_t ptr = state->pop<ptr_t>();
+        val_t val;
+
+        try {
+            val = state->pop<val_t>();
+        } catch (const std::runtime_error&) {
+            state->push(ptr);
+            throw;
+        }
+
+        state->setData(ptr, val);
+    }
+
+    void get(State* state) {
+        ptr_t ptr = state->pop<ptr_t>();
+        val_t val;
+
+        try {
+            val = state->getData(ptr);
+        } catch (const std::runtime_error&) {
+            state->push(ptr);
+            throw;
+        }
+
+        state->push(val);
+    }
+
 }
 
 // Module init
 
-extern "C" void forte_init_module(State* state) {
+extern "C" void forte_init_module(forte::State* state) {
+    using namespace forte::modules::core;
     // Arithmetic
     state->addFunct("+", add);
     state->addFunct("-", sub);
