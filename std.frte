@@ -2,26 +2,6 @@
 ; Stack helpers
 ; -------------------------
 
-; Duplicate second item
-def over ( a b - a b a )
-    <> dup <>
-done
-
-; Drop second item
-def nip ( a b - b )
-    <> drop
-done
-
-; Duplicate two items
-def dup2 ( a b - a b a b )
-    over over
-done
-
-; Drop two items
-def drop2 ( a b - )
-    drop drop
-done
-
 ; Swap-set var
 def <<- ( - $ )
     <> <-
@@ -131,26 +111,4 @@ done
 ; Decrement num in var
 def -- ( $ - )
     dup -> 1 - <<- 
-done
-
-
-; -------------------------
-; IO
-; -------------------------
-
-; Print blank line
-def \n ( - )
-    '\n' .@
-done
-
-; Print tab 
-def \t ( - )
-    '\t' .@
-done
-
-; Print string
-def print ( ... @ -)
-    while dup '\0' = ! do
-        .@
-    done
 done

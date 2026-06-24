@@ -2,9 +2,21 @@
 
 #include <stdexcept>
 #include <string>
+#include <unordered_set>
 
-#include "prefix.hpp"
 #include "types.hpp"
+
+typedef struct StateContext {
+    stack_t* stack = NULL;
+    data_t* data = NULL;
+    State* global = NULL;
+    std::unordered_set<std::string> prefixTokens;
+} StateContext;
+
+typedef struct TokenWrapper {
+    tokens_t* tokens;
+    int* depth;
+} TokenWrapper;
 
 // Class to keep track of interpreter state
 class State {
@@ -17,6 +29,8 @@ class State {
         // Parent scope (conditionals/loops)
         State(StateContext context, State* parentState);
         ~State(); // Destructor
+
+        void addToken(TokenWrapper wrapper, std::string token);
 
         // Safely pop from stack, check type, and return
         template <typename T>
@@ -58,7 +72,8 @@ class State {
 
         void eval(tokens_t* tokens); // Evaluate expression
         void addFunct(std::string label, funct_t funct); // Add module funct
-
+        // Add module prefix
+        void addPrefix(std::string label, prefix_t prefix, bool insertToken); 
         void push(val_t val) { // Push value to stack
             stateContext.stack->push(val);
         }
@@ -95,4 +110,5 @@ class State {
 
         // Validate ptr
         void validatePtr(ptr_t ptr);
+
 };

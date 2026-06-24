@@ -1,7 +1,34 @@
 #include <dlfcn.h>
+#include <fstream>
 #include "loader.hpp"
+#include "helpers.hpp"
 
 namespace loader {
+    void loadFile(State* state, std::string filename) {
+        std::string line;
+        std::ifstream input(filename);
+
+        if (!input.is_open()) {
+            throw std::runtime_error("Could not open file: " + filename);
+        }
+
+        int lineNumber = 1;
+
+        while (std::getline(input, line)) {
+            try {
+                tokens_t tokens = helpers::tokenize(line);
+                state->eval(&tokens);
+
+            } catch (const std::runtime_error& e) { // Handle error
+                throw std::runtime_error(
+                        filename + ":" + std::to_string(lineNumber) + ": " + e.what()
+                        );
+            }
+
+            lineNumber++;
+        }
+    }
+
     void loadModule(State* state, const std::string path) {
         void* handle = dlopen(path.c_str(), RTLD_NOW);
 

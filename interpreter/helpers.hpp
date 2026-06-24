@@ -6,7 +6,6 @@
 // Generally useful helper functions
 namespace helpers {
     tokens_t tokenize(std::string input);
-    void file(State* state, std::string filename);
 
     // Cast value types
     template <typename T>

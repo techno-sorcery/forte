@@ -4,6 +4,6 @@
 using module_init_t = void (*)(State*);
 
 namespace loader {
-
     void loadModule(State* state, const std::string path);
+    void loadFile(State* state, const std::string path);
 }

@@ -6,6 +6,7 @@
 #include "helpers.hpp"
 #include "types.hpp"
 #include "state.hpp"
+#include "loader.hpp"
 
 #define INTERACTIVE_STRING "Forte Interpreter v1.0"
 #define INTERACTIVE_PROMPT "> "
@@ -42,7 +43,7 @@ int main(int argc, char *argv[]) {
 
         } else if (argc == 2) {
             State state;
-            helpers::file(&state, argv[1]);
+            loader::loadFile(&state, argv[1]);
 
         } else {
             std::cerr << "Usage: " << argv[0] << " [file]" << std::endl;

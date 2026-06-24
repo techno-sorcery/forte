@@ -1,5 +1,6 @@
 #pragma once
 
+#include <any>
 #include <cstddef>
 #include <variant>
 #include <stack>
@@ -35,8 +36,8 @@ using entry_t = std::variant<funct_t, prefix_t, ptr_t, tokens_t>;
 using symtable_t = std::map<std::string, entry_t>; // Symtable map
 
 // Struct for holding state class context
-typedef struct StateContext {
-    stack_t* stack = NULL;
-    data_t* data = NULL;
-    State* global = NULL;
-} StateContext;
+
+typedef struct PrefixContext {
+    prefix_t prefix = NULL;
+    std::any data;
+} PrefixContext;

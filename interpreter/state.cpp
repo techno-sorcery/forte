@@ -1,35 +1,24 @@
 #include "state.hpp"
 #include "loader.hpp"
-#include "prefix.hpp"
 #include "types.hpp"
 #include <dlfcn.h>
+#include <iostream>
 #include <string>
+
 
 // Global
 State::State() {
     stateContext.global = this;
     stateContext.stack = new stack_t;
     stateContext.data = new data_t;
+    symtable = new symtable_t;
     passedSym = false;
     dataBase = 0;
     parent = NULL;
     handles = {};
 
     // Fill symtable with built-in functions
-    symtable = new symtable_t {
-
-        // Prefix
-        {"for", prefix::forLoop},
-        {"while", prefix::whileLoop},
-        {"rep", prefix::rep},
-        {"if", prefix::ifElse},
-        {"cast", prefix::cast},
-        {"var", prefix::var},
-        {"def", prefix::def},
-        {"import", prefix::import},
-    };
-
-    // Fill symtable with built-in functions
+    loader::loadModule(this, "modules/prefix.so");
     loader::loadModule(this, "modules/core.so");
     loader::loadModule(this, "modules/io.so");
 }
@@ -77,9 +66,9 @@ State::~State() {
     }
 
     // Handles
-    for (void* handle : handles) {
-        dlclose(handle);
-    }
+    // for (void* handle : handles) {
+    //     dlclose(handle);
+    // }
 
     // Symtable
     if (!passedSym) {
@@ -91,6 +80,16 @@ void State::addFunct(std::string label, funct_t funct) {
     validateSym(label, 1);
 
     (*symtable)[label] = funct;
+}
+
+void State::addPrefix(std::string label, prefix_t prefix, bool insertToken) {
+    validateSym(label, 1);
+
+    (*symtable)[label] = prefix;
+
+    if (insertToken) {
+        stateContext.prefixTokens.insert(label);
+    }
 }
 
 void State::validateSym(std::string label, bool checkExists) {
@@ -327,6 +326,28 @@ void State::eval(tokens_t* tokens) {
                     throw std::runtime_error("Unknown token: " + token);
                 }
             }
+        }
+    }
+}
+
+void State::addToken(TokenWrapper wrapper, std::string token) {
+    if (wrapper.tokens != NULL) {
+        wrapper.tokens->push_back(token);
+    }
+
+    auto& prefixTokens = stateContext.prefixTokens;
+
+    // Increase depth
+    if (prefixTokens.count(token) > 0) {
+
+        (*wrapper.depth)++;
+
+    } else if (token == "done") { // Decrease depth
+        (*wrapper.depth)--;
+
+        // Throw if invalid depth
+        if (*wrapper.depth < 0) {
+            throw std::runtime_error("Unbalanced prefix statements");
         }
     }
 }
