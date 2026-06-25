@@ -333,49 +333,48 @@ namespace forte::modules::core {
 }
 
 // Module init
-
 extern "C" void forte_init_module(forte::State* state) {
     using namespace forte::modules::core;
     // Arithmetic
-    state->addFunct("+", add);
-    state->addFunct("-", sub);
-    state->addFunct("*", mult);
-    state->addFunct("/", divide);
+    state->newEntry("+", add);
+    state->newEntry("-", sub);
+    state->newEntry("*", mult);
+    state->newEntry("/", divide);
 
     // Bitwise
-    state->addFunct("&", band);
-    state->addFunct("|", bor);
-    state->addFunct("^", bxor);
-    state->addFunct("~", bnot);
-    state->addFunct("<<", shl);
-    state->addFunct(">>", shr);
+    state->newEntry("&", band);
+    state->newEntry("|", bor);
+    state->newEntry("^", bxor);
+    state->newEntry("~", bnot);
+    state->newEntry("<<", shl);
+    state->newEntry(">>", shr);
 
     // Comparison / logic
-    state->addFunct("&&", land);
-    state->addFunct("||", lor);
-    state->addFunct(">", gt);
-    state->addFunct("<", lt);
-    state->addFunct("=", eq);
-    state->addFunct("!=", neq);
-    state->addFunct("<=", lte);
-    state->addFunct(">=", gte);
-    state->addFunct("!", lnot);
+    state->newEntry("&&", land);
+    state->newEntry("||", lor);
+    state->newEntry(">", gt);
+    state->newEntry("<", lt);
+    state->newEntry("=", eq);
+    state->newEntry("!=", neq);
+    state->newEntry("<=", lte);
+    state->newEntry(">=", gte);
+    state->newEntry("!", lnot);
 
     // Control
-    state->addFunct("exit", exitProgram);
+    state->newEntry("exit", exitProgram);
 
     // Stack manipulation
-    state->addFunct("drop", drop);
-    state->addFunct("dup", dup);
-    state->addFunct("<>", swap);
-    state->addFunct("over", over);
-    state->addFunct("rot", rot);
-    state->addFunct("nip", nip);
-    state->addFunct("tuck", tuck);
-    state->addFunct("drop2", twoDrop);
-    state->addFunct("dup2", twoDup);
+    state->newEntry("drop", drop);
+    state->newEntry("dup", dup);
+    state->newEntry("<>", swap);
+    state->newEntry("over", over);
+    state->newEntry("rot", rot);
+    state->newEntry("nip", nip);
+    state->newEntry("tuck", tuck);
+    state->newEntry("drop2", twoDrop);
+    state->newEntry("dup2", twoDup);
 
     // Data
-    state->addFunct("<-", set);
-    state->addFunct("->", get);
+    state->newEntry("<-", set);
+    state->newEntry("->", get);
 }

@@ -1,118 +1,93 @@
 #pragma once
 
-#include <stdexcept>
+#include <memory>
 #include <string>
-#include <unordered_set>
-
 #include "types.hpp"
+#include "runtime.hpp"
+#include "scope.hpp"
 
 namespace forte {
-    typedef struct StateContext {
-        stack_t* stack = NULL;
-        data_t* data = NULL;
-        State* global = NULL;
-        std::unordered_set<std::string> prefixTokens;
-    } StateContext;
+    enum class StateMode : bool {
+        NewScope,
+        SharedScope
+    };
 
-    typedef struct TokenWrapper {
-        tokens_t* tokens;
-        int* depth;
-    } TokenWrapper;
+    enum class PrefixEntryMode : bool {
+        NoToken,
+        AddToken
+    };
 
     // Class to keep track of interpreter state
     class State {
         public:
             State(); // Global scope
-                     // Local scope
-            State(StateContext context);
-            // Local scope + pass in symtable
-            State(StateContext context, symtable_t* globalTable);
-            // Parent scope (conditionals/loops)
-            State(StateContext context, State* parentState);
+            // Local scope
+            State(runtime_t parentRuntime, scope_t parentScope, 
+                    State* parentState, StateMode mode);
+            // Local scope + pass in scope
+            State(Runtime* parentRuntime, State* parentState, Scope* parentScope);
             ~State(); // Destructor
 
             void addToken(TokenWrapper wrapper, std::string token);
 
-            // Safely pop from stack, check type, and return
-            template <typename T>
-                T pop() {
-                    stack_t* stack = stateContext.stack;
-
-                    if (stack->size() < 1) {
-                        throw std::runtime_error("Stack underflow");
-                    }
-
-                    val_t a = stack->top();
-
-                    if constexpr (std::is_same_v<T, val_t>) {
-                        stack->pop();
-                        return a;
-
-                    } else {
-                        if (!std::holds_alternative<T>(a)) {
-                            throw std::runtime_error("Invalid type");
-                        }
-
-                        stack->pop();
-                        return std::get<T>(a);
-                    }
-                }
-
-
-            ptr_t alloc(int entries); // Allocate blank entries
-
-            bool inSymtable(std::string label); // Check if label in symtable
-            entry_t getSymEntry(std::string label); // Return symtable entry
-
             // Create new symtable entry and allocate data entries
-            ptr_t newSymEntry(std::string label, int entries);
-            tokens_t* newFunction(std::string label);
+            ptr_t newEntry(std::string label, int entries);
+            void newEntry(std::string label, funct_t funct); // Add module funct
 
-            val_t getData(ptr_t ptr); // Return data located at pointer
-            void setData(ptr_t ptr, val_t val); // Set data at pointer location
+            // Add module prefix
+            void newEntry(std::string label, prefix_t prefix, 
+                    PrefixEntryMode mode);
+
+            tokens_t* newEntry(std::string label); // Add used defined function
 
             void eval(tokens_t* tokens); // Evaluate expression
-            void addFunct(std::string label, funct_t funct); // Add module funct
-                                                             // Add module prefix
-            void addPrefix(std::string label, prefix_t prefix, bool insertToken); 
-            void push(val_t val) { // Push value to stack
-                stateContext.stack->push(val);
-            }
-
-            void addHandle(void* handle) {
-                handles.push_back(handle);
-            }
-
-            StateContext getStateContext() {
-                return stateContext;
-            }
-
-            symtable_t* getSymtable() {
-                return symtable;
-            }
 
             PrefixContext* getPrefixContext() {
                 return &prefixContext;
             }
 
+            void push(val_t val) { // Push to runtime stack
+                runtime->push(val);
+            }
+
+            // Pop from runtime stack
+            template <typename T>
+                T pop() {
+                    return runtime->pop<T>();
+                }
+
+            void addHandle(void* handle) { // Add runtime handle
+                runtime->addHandle(handle);
+            }
+
+            void setData(ptr_t ptr, val_t val) { // Set runtime data at pointer
+                runtime->setData(ptr, val);
+            } 
+
+            val_t getData(ptr_t ptr) { // Return data located at pointer
+                return runtime->getData(ptr);
+            }
+
+            std::shared_ptr<Runtime> getRuntime() {
+                return runtime;
+            }
+
+            std::shared_ptr<Scope> getScope() {
+                return scope;
+            }
 
         private:
-            StateContext stateContext;
-            PrefixContext prefixContext;
+            runtime_t runtime = nullptr;
+            scope_t scope = nullptr;
 
-            symtable_t* symtable = NULL;
+            State* parent = nullptr;
             ptr_t dataBase;
-            bool passedSym = false;
-            State* parent = NULL;
-            std::vector<void*> handles;
 
-            // Validate label
-            void validateSym(std::string label, bool checkExists); 
+            // StateContext stateContext;
+            PrefixContext prefixContext;
 
             // Validate ptr
             void validatePtr(ptr_t ptr);
-
     };
-
 }
 

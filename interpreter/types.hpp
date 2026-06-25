@@ -2,6 +2,7 @@
 
 #include <any>
 #include <cstddef>
+#include <memory>
 #include <unordered_map>
 #include <variant>
 #include <stack>
@@ -10,6 +11,11 @@
 
 namespace forte {
     class State;
+    class Runtime;
+    class Scope;
+
+    using runtime_t = std::shared_ptr<Runtime>;
+    using scope_t = std::shared_ptr<Scope>;
 
     // Value types
     using num_t = double; // Numeric type
@@ -43,4 +49,8 @@ namespace forte {
         std::any data;
     };
 
+    struct TokenWrapper {
+        tokens_t* tokens;
+        int* depth;
+    };
 }

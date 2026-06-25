@@ -112,15 +112,15 @@ namespace forte::modules::io {
 extern "C" void forte_init_module(forte::State* state) {
     using namespace forte::modules::io;
 
-    state->addFunct("in", in);
-    state->addFunct(".#", outNum);
-    state->addFunct(".@", outChar);
-    state->addFunct(".$", outPtr);
-    state->addFunct(".%", outWord);
-    state->addFunct("print", print);
-    state->addFunct("println", print);
-    state->addFunct("\\n", newline);
-    state->addFunct("\\t", tab);
-    state->addFunct("cat", concat);
-    state->addFunct("flush", flush);
+    state->newEntry("in", in);
+    state->newEntry(".#", outNum);
+    state->newEntry(".@", outChar);
+    state->newEntry(".$", outPtr);
+    state->newEntry(".%", outWord);
+    state->newEntry("print", print);
+    state->newEntry("println", printLine);
+    state->newEntry("\\n", newline);
+    state->newEntry("\\t", tab);
+    state->newEntry("cat", concat);
+    state->newEntry("flush", flush);
 }

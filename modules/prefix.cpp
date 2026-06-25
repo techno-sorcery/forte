@@ -100,7 +100,7 @@ namespace forte::modules::prefix {
             if (context->body.size() > 0) {
 
                 // Create child state
-                State child(state->getStateContext(), state);
+                State child(state->getRuntime(), state->getScope(), state, StateMode::NewScope);
 
                 // Evaluate body
                 child.eval(&context->body);
@@ -151,7 +151,7 @@ namespace forte::modules::prefix {
                 && context->depth == 0) { // Last iteration
 
             // Create child state
-            State child(state->getStateContext(), state);
+            State child(state->getRuntime(), state->getScope(), state, StateMode::NewScope);
 
             // Eval loop
             while (true) {
@@ -201,7 +201,7 @@ namespace forte::modules::prefix {
                     && context->depth == 0) { // Last iteration
 
                 // Create child state
-                State child(state->getStateContext(), state);
+                State child(state->getRuntime(), state->getScope(), state, StateMode::NewScope);
 
                 // Eval loop
                 while (true) {
@@ -267,7 +267,7 @@ namespace forte::modules::prefix {
                     && context->depth == 0) { // Last iteration
 
                 // Create child state
-                State child(state->getStateContext(), state);
+                State child(state->getRuntime(), state->getScope(), state, StateMode::NewScope);
 
                 // Init
                 child.eval(&context->init);
@@ -318,7 +318,8 @@ namespace forte::modules::prefix {
             return true;
         }
 
-        State importState(state->getStateContext(), state->getSymtable());
+        State importState(state->getRuntime(), state->getScope(), state, StateMode::SharedScope);
+
         loader::loadFile(&importState, token);
         return true;
     }
@@ -330,7 +331,7 @@ namespace forte::modules::prefix {
         } else { // Second iteration
 
             // Create new entry and push data entry ptr to stack
-            ptr_t ptr = state->newSymEntry(token, 1);
+            ptr_t ptr = state->newEntry(token, 1);
             state->push(ptr);
 
             return true;
@@ -348,7 +349,7 @@ namespace forte::modules::prefix {
         DefContext* context = &std::any_cast<DefContext&>(prefixContext->data);
 
         if (context->tokens == NULL) { // Second iteration, create symbol
-            context->tokens = state->newFunction(token);
+            context->tokens = state->newEntry(token);
 
         } else if (token == "done" 
                 && context->depth == 0) { // Last iteration
@@ -366,12 +367,12 @@ namespace forte::modules::prefix {
 extern "C" void forte_init_module(forte::State* state)  {
     using namespace forte::modules::prefix;
 
-    state->addPrefix("for", forLoop, true);
-    state->addPrefix("while", whileLoop, true);
-    state->addPrefix("rep", rep, true);
-    state->addPrefix("if", ifElse, true);
-    state->addPrefix("cast", cast, false);
-    state->addPrefix("var", var, false);
-    state->addPrefix("def", def, true);
-    state->addPrefix("import", import, false);
+    state->newEntry("for", forLoop, forte::PrefixEntryMode::AddToken);
+    state->newEntry("while", whileLoop, forte::PrefixEntryMode::AddToken);
+    state->newEntry("rep", rep, forte::PrefixEntryMode::AddToken);
+    state->newEntry("if", ifElse, forte::PrefixEntryMode::AddToken);
+    state->newEntry("cast", cast, forte::PrefixEntryMode::NoToken);
+    state->newEntry("var", var, forte::PrefixEntryMode::NoToken);
+    state->newEntry("def", def, forte::PrefixEntryMode::AddToken);
+    state->newEntry("import", import, forte::PrefixEntryMode::NoToken);
 }
