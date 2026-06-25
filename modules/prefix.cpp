@@ -315,20 +315,23 @@ namespace forte::modules::prefix {
             && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
     }
 
-    bool import(State* state, std::string token) {
+    bool import(State* state, std::string token) { // Module
         if (token == "") { // First iteration
             return false;
         }  
 
         // Second iteration
-        if (endsWith(token, ".so")) {
-            loader::loadModule(state, token);
-            printf("Loaded\n");
-            return true;
-        }
+        loader::loadModule(state, token);
+        return true;
+    }
 
+    bool include(State* state, std::string token) { // Library
+        if (token == "") { // First iteration
+            return false;
+        }  
+
+        // Second iteration
         State importState(state->getRuntime(), state->getScope(), state, StateMode::SharedScope);
-
         loader::loadFile(&importState, token);
         return true;
     }
@@ -384,4 +387,5 @@ extern "C" void forte_init_module(forte::State* state)  {
     state->newEntry("var", var, forte::PrefixEntryMode::NoToken);
     state->newEntry("def", def, forte::PrefixEntryMode::AddToken);
     state->newEntry("import", import, forte::PrefixEntryMode::NoToken);
+    state->newEntry("include", include, forte::PrefixEntryMode::NoToken);
 }

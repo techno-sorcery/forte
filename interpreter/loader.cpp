@@ -33,7 +33,7 @@ namespace forte::loader {
         void* handle = dlopen(path.c_str(), RTLD_NOW);
 
         if (handle == nullptr) {
-            throw std::runtime_error(std::string("dlopen failed: ") + dlerror());
+            throw std::runtime_error(std::string("Failed to import module: ") + dlerror());
         }
 
         dlerror(); // clear old error
