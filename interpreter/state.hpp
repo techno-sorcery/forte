@@ -78,13 +78,15 @@ namespace forte {
                 return runtime->getData(ptr);
             }
 
-            std::shared_ptr<Runtime> getRuntime() {
+            runtime_t getRuntime() {
                 return runtime;
             }
 
-            std::shared_ptr<Scope> getScope() {
+            scope_t getScope() {
                 return scope;
             }
+
+            void resolveLabel(label_t label); // Resolve label of unknown type
 
         private:
             runtime_t runtime = nullptr;

@@ -5,15 +5,19 @@
 #include <string>
 #include <vector>
 
+/*
+   WIP bytecode interpreter
+   */
 namespace forte::bytecode {
     using operand_t = uint64_t;
 
     enum class Op : uint8_t {
-        PUSH_VAL,
-        CALL_PREFIX,
-        CALL_FUNCT,
-        CALL_CODE,
-        CALL_LABEL
+        PushVal,
+        CallFunct,
+        CallCode,
+        ResolveLabel,
+        Jump,
+        JumpIfZero
     };
 
     struct Inst {

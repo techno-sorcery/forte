@@ -16,22 +16,26 @@ namespace forte::bytecode {
 
         // Parse opcode
         switch (inst->op) {
-            case Op::PUSH_VAL: // Push val to stack
+            case Op::PushVal: // Push val to stack
                 state->push(code->vals[inst->operand]);
                 break;
 
-            case Op::CALL_PREFIX: // Call prefix funct
-                code->prefixes[inst->operand](state, NULL);
-                break;
-
-            case Op::CALL_FUNCT:
+            case Op::CallFunct:
                 code->functs[inst->operand](state);
                 break;
 
-            case Op::CALL_CODE:
+            case Op::CallCode:
                 break;
 
-            case Op::CALL_LABEL:
+            case Op::ResolveLabel:
+                break;;
+
+            case Op::Jump:
+                break;
+
+            case Op::JumpIfZero: // Jump if stack val == 0
+                word_t cond = state->pop<word_t>();
+
                 break;
         }
     }

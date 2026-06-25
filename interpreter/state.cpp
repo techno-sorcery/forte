@@ -218,5 +218,24 @@ namespace forte {
 
         }
     }
+
+    using entry_t = std::variant<funct_t, prefix_t, ptr_t, tokens_t>;
+    void State::resolveLabel(label_t label) {
+        entry_t entry = scope->getEntry(label);
+
+        if (std::holds_alternative<funct_t>(entry)) { // Primitive
+            std::get<funct_t>(entry)(this);
+            return;
+        }
+
+        if (std::holds_alternative<ptr_t>(entry)) { // Data pointer
+            ptr_t ptr = std::get<ptr_t>(entry);
+            val_t val = runtime->getData(ptr);
+            push(val);
+            return;
+        }
+
+        throw std::runtime_error("Couldn't resolve label" + label);
+    }
 }
 
