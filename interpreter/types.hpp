@@ -9,6 +9,11 @@
 #include <string>
 #include <vector>
 
+
+/*
+   This namespace contains a bunch of definitions for types which are used
+   throughout the codebase.
+   */
 namespace forte {
     class State;
     class Runtime;
@@ -36,9 +41,8 @@ namespace forte {
 
     // Symtable types
     /* 
-       Each entry holds a primitive function pointer, prefix function pointer,
-       primitive value, array of primitive values, or array of tokens (user defined
-       function)
+       Each entry holds either a primitive function pointer, prefix function 
+       pointer, primitive value, or token vector (user defined function)
        */
     using entry_t = std::variant<funct_t, prefix_t, ptr_t, tokens_t>;
     using symtable_t = std::unordered_map<label_t, entry_t>; // Symtable map

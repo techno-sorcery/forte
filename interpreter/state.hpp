@@ -17,11 +17,21 @@ namespace forte {
         AddToken
     };
 
-    // Class to keep track of interpreter state
+    /*
+       State acts as a container for the scope and runtime objects, as well as 
+       an interface/wrapper for their functions. With the exception of prefix
+       functions passing scope/runtime objects to child states, modules 
+       interact with the interpreter through passed state pointers.
+
+       Each separate lexical scope has its own state object, which holds a 
+       pointer to the global runtime object + the global scope, its own local
+       scope, or the scope of its parent depending on whether it it's global,
+       local, or module scope.
+       */
     class State {
         public:
             State(); // Global scope
-            // Local scope
+                     // Local scope
             State(runtime_t parentRuntime, scope_t parentScope, 
                     State* parentState, StateMode mode);
             // Local scope + pass in scope

@@ -3,6 +3,10 @@
 #include <iostream>
 #include <algorithm>
 
+/*
+   This module contains functions that deal with basic I/O - think printing
+   strings, reading keyboard input (WIP), and printing primitive values.
+   */
 namespace forte::modules::io {
     template <typename T>
         void out(State* state) {

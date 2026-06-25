@@ -3,7 +3,11 @@
 #include <stdexcept>
 #include "types.hpp"
 
-// Generally useful helper functions
+/*
+   This namespace contains generally useful functions such as "tokenize" and
+   "cast" which I couldn't put/didn't feel like putting in one of the classes.
+   I might refactor it later if I find a better place for them.
+   */
 namespace forte::helpers {
     tokens_t tokenize(std::string input);
 

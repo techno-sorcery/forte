@@ -5,7 +5,12 @@
 
 namespace forte {
 
-    // Class to keep track of global stuff
+    /*
+       Runtime keeps track of globally-used interpreter data, such as the
+       data stack, return stack, and loaded module handles. It is instantiated
+       by the global state upon its own instantiation, and is passed as a
+       shared pointer between child states
+       */
     class Runtime {
         public:
             ~Runtime();

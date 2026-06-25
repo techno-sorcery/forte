@@ -1,4 +1,4 @@
-import std.frte
+import libs/std.frte
 
 "balls\n" print
 

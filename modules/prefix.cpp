@@ -3,6 +3,15 @@
 #include "../interpreter/loader.hpp"
 #include "../interpreter/types.hpp"
 
+/*
+   Despite not being named "core", this library also contains functions "core"
+   to the Forte language- stuff like "if", "while", "for", etc.
+
+   Despite being a chiefly postfix language, Forte also allows you to define
+   prefix functions, which are useful for implementing structures such as loops
+   and conditional statements. Because these rely on the interpreter's "meta"
+   state, they can only be defined in modules.
+   */
 namespace forte::modules::prefix {
     enum class forState {
         INIT,

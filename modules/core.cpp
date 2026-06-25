@@ -6,6 +6,11 @@
 #include "../interpreter/helpers.hpp"
 #include "../interpreter/types.hpp"
 
+/*
+   This module contains functions that are a core part of the Forte language. 
+   In other words, you must implement these if you want your interpreter/
+   compiler/whatever to be compatible with the base language.
+   */
 namespace forte::modules::core {
     template <typename A, typename B = A, typename Out = A, typename Op>
         void arithmetic(State* state, Op op) {

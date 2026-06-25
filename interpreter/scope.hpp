@@ -10,6 +10,17 @@ namespace forte {
         CheckDoesntExist
     };
 
+    /*
+       Scope keeps track of data relevant to a particular scope, chiefly the
+       symtable. Each state has its own scope, except for those explicitly
+       instantiated with their parent's scope. Each scope object points to
+       the scope of its parent so they can be recursively searched when 
+       resolving symbols. 
+
+       It similarly keeps a set of "block" prefix labels (ie those of a 
+       variable length, terminated with "done") so the parser can keep track
+       of function depth.
+       */
     class Scope {
 
         public:
